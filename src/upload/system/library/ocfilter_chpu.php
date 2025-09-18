@@ -47,6 +47,64 @@ class OCFilterCHPU
     }
 
     /**
+     * Конвертирует аргументы URL с ocf в ЧПУ (для серверной генерации ссылок)
+     */
+    public function convertUrlArgs($route, $args)
+    {
+        if (!$this->isEnabled() || $route !== 'product/category' || strpos($args, 'ocf=') === false) {
+            return $args;
+        }
+
+        parse_str($args, $params);
+
+        if (isset($params['ocf']) && isset($params['path'])) {
+            $chpu_path = $this->generateChpuPath($params['ocf']);
+
+            if ($chpu_path) {
+                // Получаем keyword категории
+                $category_keyword = $this->getCategoryKeywordByPath($params['path']);
+                
+                if ($category_keyword) {
+                    // Убираем ocf и route параметры
+                    unset($params['ocf']);
+                    unset($params['route']);
+                    
+                    // Формируем ЧПУ маршрут
+                    $params['_route_'] = $category_keyword . $chpu_path;
+                    unset($params['path']);
+                }
+            }
+        }
+
+        return http_build_query($params);
+    }
+
+    /**
+     * Получает SEO keyword категории по path
+     */
+    private function getCategoryKeywordByPath($path)
+    {
+        $cache_key = 'ocfilter_chpu.category.keyword.' . $path . '.' . $this->config->get('config_store_id') . '.' . $this->config->get('config_language_id');
+        $keyword = $this->cache->get($cache_key);
+
+        if ($keyword === null) {
+            $query = $this->db->query("
+                SELECT keyword
+                FROM " . DB_PREFIX . "seo_url 
+                WHERE `query` = 'category_id=" . (int)$path . "'
+                AND store_id = '" . (int)$this->config->get('config_store_id') . "'
+                AND language_id = '" . (int)$this->config->get('config_language_id') . "'
+                LIMIT 1
+            ");
+
+            $keyword = $query->num_rows ? $query->row['keyword'] : false;
+            $this->cache->set($cache_key, $keyword);
+        }
+
+        return $keyword;
+    }
+
+    /**
      * Обрабатывает входящий URL и преобразует ЧПУ в ocf параметр
      */
     public function processIncomingUrl()

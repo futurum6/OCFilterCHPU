@@ -6,8 +6,7 @@
     <author>futurum6</author>
     <link>https://github.com/futurum6</link>
 
-     
-    <!-- Add OCFilter CHPU URL processing -->
+    <!-- Add OCFilter CHPU URL processing for incoming URLs -->
     <file path="catalog/controller/startup/seo_url.php">
         <operation>
             <search><![CDATA[public function index() {]]></search>
@@ -26,49 +25,22 @@
         </operation>
     </file>
     
-    <!-- Add CHPU conversion script -->
-    <file path="catalog/view/theme/*/template/extension/module/ocfilter.twig">
+    <!-- Add CHPU URL generation for outgoing links -->
+    <file path="system/library/url.php">
         <operation>
-            <search><![CDATA[<script type="text/javascript">]]></search>
+            <search><![CDATA[public function link($route, $args = '', $connection = 'NONSSL') {]]></search>
             <add position="after"><![CDATA[
-// OCFilter CHPU integration
-{% if config_ocfilter_chpu_status %}
-var ocfilter_chpu_enabled = true;
-var ocfilter_chpu_separator = '{{ config_ocfilter_chpu_separator|default('-') }}';
-
-function ocfilter_chpu_convert(url) {
-    if (url.indexOf('ocf=') === -1) return url;
-    
-    // AJAX request to convert ocf to CHPU
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'index.php?route=extension/module/ocfilter_chpu/convertUrl', false);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send('url=' + encodeURIComponent(url));
-    
-    if (xhr.status === 200) {
-        try {
-            var response = JSON.parse(xhr.responseText);
-            if (response.success && response.chpu_url) {
-                return response.chpu_url;
+        // OCFilter CHPU URL conversion for outgoing links
+        if ($this->config->get('ocfilter_chpu_status') && strpos($args, 'ocf=') !== false) {
+            try {
+                $this->load->library('ocfilter_chpu');
+                if ($this->ocfilter_chpu && method_exists($this->ocfilter_chpu, 'convertUrlArgs')) {
+                    $args = $this->ocfilter_chpu->convertUrlArgs($route, $args);
+                }
+            } catch (Exception $e) {
+                error_log('OCFilterCHPU URL conversion error: ' . $e->getMessage());
             }
-        } catch (e) {}
-    }
-    
-    return url;
-}
-
-// Override history.pushState for OCFilter AJAX
-if (typeof history.pushState === 'function') {
-    var original_pushState = history.pushState;
-    history.pushState = function(state, title, url) {
-        if (url && url.indexOf('ocf=') !== -1) {
-            url = ocfilter_chpu_convert(url);
-        }
-        return original_pushState.call(history, state, title, url);
-    };
-}
-{% endif %}
-]]></add>
+        }]]></add>
         </operation>
     </file>
 </modification>

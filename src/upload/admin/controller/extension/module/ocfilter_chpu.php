@@ -1,8 +1,10 @@
 <?php
-class ControllerExtensionModuleOcfilterChpu extends Controller {
+class ControllerExtensionModuleOcfilterChpu extends Controller
+{
     private $error = array();
 
-    public function index() {
+    public function index()
+    {
         $this->load->language('extension/module/ocfilter_chpu');
         $this->document->setTitle($this->language->get('heading_title'));
         $this->load->model('setting/setting');
@@ -15,7 +17,7 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
 
         // Правильная проверка наличия OCFilter
         $data['ocfilter_installed'] = $this->isOCFilterInstalled();
-        
+
         if (!$data['ocfilter_installed']) {
             $data['error_warning'] = 'Для работы модуля требуется установленный OCFilter!';
         } elseif (isset($this->error['warning'])) {
@@ -61,7 +63,8 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
     /**
      * Получает токен для URL (совместимость с разными версиями)
      */
-    private function getToken() {
+    private function getToken()
+    {
         if (isset($this->session->data['user_token'])) {
             return $this->session->data['user_token'];
         } elseif (isset($this->session->data['token'])) {
@@ -73,13 +76,14 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
     /**
      * Правильная проверка наличия OCFilter
      */
-    private function isOCFilterInstalled() {
+    private function isOCFilterInstalled()
+    {
         // Проверяем наличие таблиц OCFilter
-        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "ocfilter_option'");
+        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "ocfilter_filter'");
         if ($result->num_rows == 0) {
             return false;
-        }
-        
+        } 
+ 
         // Проверяем наличие модели OCFilter
         try {
             $this->load->model('extension/module/ocfilter');
@@ -89,18 +93,21 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
         }
     }
 
-    public function install() {
+    public function install()
+    {
         if (!$this->isOCFilterInstalled()) {
             $this->session->data['error'] = 'Для работы модуля OCFilterCHPU требуется установленный модуль OCFilter!';
         }
-    } 
+    }
 
-    public function uninstall() {
+    public function uninstall()
+    {
         $this->load->model('setting/setting');
         $this->model_setting_setting->deleteSetting('ocfilter_chpu');
     }
 
-    protected function validate() {
+    protected function validate()
+    {
         if (!$this->user->hasPermission('modify', 'extension/module/ocfilter_chpu')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
