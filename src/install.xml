@@ -14,9 +14,10 @@
         // OCFilter CHPU URL processing
         if ($this->config->get('ocfilter_chpu_status')) {
             try {
-                $this->load->library('ocfilter_chpu');
-                if ($this->ocfilter_chpu && method_exists($this->ocfilter_chpu, 'processIncomingUrl')) {
-                    $this->ocfilter_chpu->processIncomingUrl();
+                require_once(DIR_SYSTEM . 'library/ocfilter_chpu.php');
+                $ocfilter_chpu = new OCFilterCHPU($this->registry);
+                if ($ocfilter_chpu && method_exists($ocfilter_chpu, 'processIncomingUrl')) {
+                    $ocfilter_chpu->processIncomingUrl();
                 }
             } catch (Exception $e) {
                 error_log('OCFilterCHPU error: ' . $e->getMessage());
@@ -31,16 +32,17 @@
             <search><![CDATA[public function link($route, $args = '', $connection = 'NONSSL') {]]></search>
             <add position="after"><![CDATA[
         // OCFilter CHPU URL conversion for outgoing links
-        if ($this->config->get('ocfilter_chpu_status') && strpos($args, 'ocf=') !== false) {
+        if (isset($this->registry) && $this->registry->get('config')->get('ocfilter_chpu_status') && strpos($args, 'ocf=') !== false) {
             try {
-                $this->load->library('ocfilter_chpu');
-                if ($this->ocfilter_chpu && method_exists($this->ocfilter_chpu, 'convertUrlArgs')) {
-                    $args = $this->ocfilter_chpu->convertUrlArgs($route, $args);
+                require_once(DIR_SYSTEM . 'library/ocfilter_chpu.php');
+                $ocfilter_chpu = new OCFilterCHPU($this->registry);
+                if ($ocfilter_chpu && method_exists($ocfilter_chpu, 'convertUrlArgs')) {
+                    $args = $ocfilter_chpu->convertUrlArgs($route, $args);
                 }
             } catch (Exception $e) {
                 error_log('OCFilterCHPU URL conversion error: ' . $e->getMessage());
             }
-        }]]></add>
+        }]]></add> 
         </operation>
     </file>
 </modification>

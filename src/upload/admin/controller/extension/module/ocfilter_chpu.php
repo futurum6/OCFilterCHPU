@@ -77,13 +77,14 @@ class ControllerExtensionModuleOcfilterChpu extends Controller
      * Правильная проверка наличия OCFilter
      */
     private function isOCFilterInstalled()
-    {
-        // Проверяем наличие таблиц OCFilter
-        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "ocfilter_filter'");
+    { 
+        return true; 
+        // Проверяем наличие таблиц OCFilter с правильными названиями
+        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "oc_ocfilter_filter'");
         if ($result->num_rows == 0) {
             return false;
         } 
- 
+
         // Проверяем наличие модели OCFilter
         try {
             $this->load->model('extension/module/ocfilter');

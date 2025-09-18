@@ -1,7 +1,7 @@
 <?php
 class OCFilterCHPU
 {
-    private $registry;
+    private $registry; 
     private $config;
     private $db;
     private $request;
@@ -42,7 +42,7 @@ class OCFilterCHPU
     private function isOCFilterAvailable()
     {
         // Проверяем наличие основных таблиц OCFilter
-        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "ocfilter_filter'");
+        $result = $this->db->query("SHOW TABLES LIKE '" . DB_PREFIX . "oc_ocfilter_filter'");
         return $result->num_rows > 0;
     }
 
@@ -307,9 +307,9 @@ class OCFilterCHPU
         if ($filter_data === null) {
             // Ищем по названию (транслитерированному)
             $query = $this->db->query("
-                SELECT o.ocfilter_filter_id as option_id, od.name 
-                FROM " . DB_PREFIX . "ocfilter_filter o
-                LEFT JOIN " . DB_PREFIX . "ocfilter_filter_description od ON (o.ocfilter_filter_id = od.ocfilter_filter_id)
+                SELECT o.oc_ocfilter_filter_id as option_id, od.name 
+                FROM " . DB_PREFIX . "oc_ocfilter_filter o
+                LEFT JOIN " . DB_PREFIX . "oc_ocfilter_filter_description od ON (o.oc_ocfilter_filter_id = od.oc_ocfilter_filter_id)
                 WHERE od.language_id = '" . (int)$this->config->get('config_language_id') . "'
                 AND o.status = '1'
                 LIMIT 50
@@ -343,10 +343,10 @@ class OCFilterCHPU
 
         if ($value_data === null) {
             $query = $this->db->query("
-                SELECT ov.ocfilter_filter_value_id as option_value_id, ovd.name
-                FROM " . DB_PREFIX . "ocfilter_filter_value ov
-                LEFT JOIN " . DB_PREFIX . "ocfilter_filter_value_description ovd ON (ov.ocfilter_filter_value_id = ovd.ocfilter_filter_value_id)
-                WHERE ov.ocfilter_filter_id = '" . (int)$option_id . "'
+                SELECT ov.oc_ocfilter_filter_value_id as option_value_id, ovd.name
+                FROM " . DB_PREFIX . "oc_ocfilter_filter_value ov
+                LEFT JOIN " . DB_PREFIX . "oc_ocfilter_filter_value_description ovd ON (ov.oc_ocfilter_filter_value_id = ovd.oc_ocfilter_filter_value_id)
+                WHERE ov.oc_ocfilter_filter_id = '" . (int)$option_id . "'
                 AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'
                 LIMIT 100
             ");
@@ -370,10 +370,10 @@ class OCFilterCHPU
     private function getFilterById($option_id)
     {
         $query = $this->db->query("
-            SELECT o.ocfilter_filter_id as option_id, od.name
-            FROM " . DB_PREFIX . "ocfilter_filter o
-            LEFT JOIN " . DB_PREFIX . "ocfilter_filter_description od ON (o.ocfilter_filter_id = od.ocfilter_filter_id)
-            WHERE o.ocfilter_filter_id = '" . (int)$option_id . "'
+            SELECT o.oc_ocfilter_filter_id as option_id, od.name
+            FROM " . DB_PREFIX . "oc_ocfilter_filter o
+            LEFT JOIN " . DB_PREFIX . "oc_ocfilter_filter_description od ON (o.oc_ocfilter_filter_id = od.oc_ocfilter_filter_id)
+            WHERE o.oc_ocfilter_filter_id = '" . (int)$option_id . "'
             AND od.language_id = '" . (int)$this->config->get('config_language_id') . "'
             AND o.status = '1'
             LIMIT 1
@@ -388,10 +388,10 @@ class OCFilterCHPU
     private function getFilterValueById($value_id)
     {
         $query = $this->db->query("
-            SELECT ov.ocfilter_filter_value_id as option_value_id, ovd.name
-            FROM " . DB_PREFIX . "ocfilter_filter_value ov
-            LEFT JOIN " . DB_PREFIX . "ocfilter_filter_value_description ovd ON (ov.ocfilter_filter_value_id = ovd.ocfilter_filter_value_id)
-            WHERE ov.ocfilter_filter_value_id = '" . (int)$value_id . "'
+            SELECT ov.oc_ocfilter_filter_value_id as option_value_id, ovd.name
+            FROM " . DB_PREFIX . "oc_ocfilter_filter_value ov
+            LEFT JOIN " . DB_PREFIX . "oc_ocfilter_filter_value_description ovd ON (ov.oc_ocfilter_filter_value_id = ovd.oc_ocfilter_filter_value_id)
+            WHERE ov.oc_ocfilter_filter_value_id = '" . (int)$value_id . "'
             AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'
             LIMIT 1
         ");
