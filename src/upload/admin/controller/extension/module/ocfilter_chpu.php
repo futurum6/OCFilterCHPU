@@ -10,7 +10,7 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
         if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
             $this->model_setting_setting->editSetting('ocfilter_chpu', $this->request->post);
             $this->session->data['success'] = $this->language->get('text_success');
-            $this->response->redirect($this->url->link('extension/module/ocfilter_chpu', 'token=' . $this->session->data['token'], true));
+            $this->response->redirect($this->url->link('extension/module/ocfilter_chpu', 'user_token=' . $this->getToken(), true));
         }
 
         // Правильная проверка наличия OCFilter
@@ -27,19 +27,24 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
         $data['breadcrumbs'] = array();
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('text_home'),
-            'href' => $this->url->link('common/dashboard', 'token=' . $this->session->data['token'], true)
+            'href' => $this->url->link('common/dashboard', 'user_token=' . $this->getToken(), true)
         );
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('text_extension'),
-            'href' => $this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=module', true)
+            'href' => $this->url->link('marketplace/extension', 'user_token=' . $this->getToken() . '&type=module', true)
         );
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('heading_title'),
-            'href' => $this->url->link('extension/module/ocfilter_chpu', 'token=' . $this->session->data['token'], true)
+            'href' => $this->url->link('extension/module/ocfilter_chpu', 'user_token=' . $this->getToken(), true)
         );
 
-        $data['action'] = $this->url->link('extension/module/ocfilter_chpu', 'token=' . $this->session->data['token'], true);
-        $data['cancel'] = $this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=module', true);
+        $data['action'] = $this->url->link('extension/module/ocfilter_chpu', 'user_token=' . $this->getToken(), true);
+        $data['cancel'] = $this->url->link('marketplace/extension', 'user_token=' . $this->getToken() . '&type=module', true);
+
+        // Языковые переменные для кнопок
+        $data['button_save'] = $this->language->get('button_save');
+        $data['button_cancel'] = $this->language->get('button_cancel');
+        $data['text_home'] = $this->language->get('text_home');
 
         // Настройки
         $data['ocfilter_chpu_status'] = $this->config->get('ocfilter_chpu_status') ?: 0;
@@ -51,6 +56,18 @@ class ControllerExtensionModuleOcfilterChpu extends Controller {
         $data['footer'] = $this->load->controller('common/footer');
 
         $this->response->setOutput($this->load->view('extension/module/ocfilter_chpu', $data));
+    }
+
+    /**
+     * Получает токен для URL (совместимость с разными версиями)
+     */
+    private function getToken() {
+        if (isset($this->session->data['user_token'])) {
+            return $this->session->data['user_token'];
+        } elseif (isset($this->session->data['token'])) {
+            return $this->session->data['token'];
+        }
+        return '';
     }
 
     /**

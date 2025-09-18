@@ -11,4 +11,4 @@ $_['entry_separator']  = 'Разделитель';
 $_['help_url_format']  = 'Использовать ID или keyword для генерации URL<br/><b>keyword</b> - /brand-samsung/<br/><b>id</b> - /1-2/';
 $_['help_separator']   = 'Разделитель между названием фильтра и значением (по умолчанию: -)';
 $_['error_permission'] = 'У вас недостаточно прав для изменения модуля OCFilter ЧПУ!';
-?>
+ 
