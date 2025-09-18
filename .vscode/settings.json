@@ -1,0 +1,22 @@
+{
+   "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": ".*", 
+                "cmd": "powershell -Command \"if (Test-Path .\\output\\\OCFilterCHPU.ocmod.zip) { Remove-Item .\\output\\OCFilterCHPU.ocmod.zip }\"",
+                "silent": true 
+            },
+            {
+                "match": ".*", 
+                "cmd": "powershell Compress-Archive -Path .\\src\\* -DestinationPath .\\output\\OCFilterCHPU.ocmod.zip",
+                "silent": true 
+            },
+            {
+                "match": ".*", 
+                "cmd": "powershell Copy-Item -Path .\\src\\upload\\* -Destination D:\\laragon\\www\\new-baby -Recurse -Force",
+                "silent": true 
+            }
+    
+        ]
+    }
+} 

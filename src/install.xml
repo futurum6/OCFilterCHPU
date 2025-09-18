@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <n>OCFilterCHPU</n>
+    <version>1.0.0</version>
+    <author>Developer</author>
+    <link>https://ocfilterchpu.com</link>
+    <code>ocfilter_chpu</code>
+    
+    <!-- Add OCFilter CHPU URL processing -->
+    <file path="catalog/controller/startup/seo_url.php">
+        <operation>
+            <search><![CDATA[public function index() {]]></search>
+            <add position="after"><![CDATA[
+        // OCFilter CHPU URL processing
+        if ($this->config->get('ocfilter_chpu_status')) {
+            try {
+                $this->load->library('ocfilter_chpu');
+                if ($this->ocfilter_chpu && method_exists($this->ocfilter_chpu, 'processIncomingUrl')) {
+                    $this->ocfilter_chpu->processIncomingUrl();
+                }
+            } catch (Exception $e) {
+                error_log('OCFilterCHPU error: ' . $e->getMessage());
+            }
+        }]]></add>
+        </operation>
+    </file>
+    
+    <!-- Add CHPU conversion script -->
+    <file path="catalog/view/theme/*/template/extension/module/ocfilter.twig">
+        <operation>
+            <search><![CDATA[<script type="text/javascript">]]></search>
+            <add position="after"><![CDATA[
+// OCFilter CHPU integration
+{% if config_ocfilter_chpu_status %}
+var ocfilter_chpu_enabled = true;
+var ocfilter_chpu_separator = '{{ config_ocfilter_chpu_separator|default('-') }}';
+
+function ocfilter_chpu_convert(url) {
+    if (url.indexOf('ocf=') === -1) return url;
+    
+    // AJAX request to convert ocf to CHPU
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'index.php?route=extension/module/ocfilter_chpu/convertUrl', false);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.send('url=' + encodeURIComponent(url));
+    
+    if (xhr.status === 200) {
+        try {
+            var response = JSON.parse(xhr.responseText);
+            if (response.success && response.chpu_url) {
+                return response.chpu_url;
+            }
+        } catch (e) {}
+    }
+    
+    return url;
+}
+
+// Override history.pushState for OCFilter AJAX
+if (typeof history.pushState === 'function') {
+    var original_pushState = history.pushState;
+    history.pushState = function(state, title, url) {
+        if (url && url.indexOf('ocf=') !== -1) {
+            url = ocfilter_chpu_convert(url);
+        }
+        return original_pushState.call(history, state, title, url);
+    };
+}
+{% endif %}
+]]></add>
+        </operation>
+    </file>
+</modification>
