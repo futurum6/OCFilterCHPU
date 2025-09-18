@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
-    <n>OCFilterCHPU</n>
-    <version>1.0.0</version>
-    <author>Developer</author>
-    <link>https://ocfilterchpu.com</link>
+    <name>OCFilterCHPU</name>
     <code>ocfilter_chpu</code>
-    
+    <version>1.0.0</version>
+    <author>futurum6</author>
+    <link>https://github.com/futurum6</link>
+
+     
     <!-- Add OCFilter CHPU URL processing -->
     <file path="catalog/controller/startup/seo_url.php">
         <operation>
